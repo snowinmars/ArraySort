@@ -49,11 +49,13 @@ namespace ConsoleApplication1
 
         private static string GetCode(int amountOfDimension, int[] dimensionLength)
         {
+            string space = Program.GetSpace();
+
             string startFrame = Program.GetStartFrame();
 
             string declare = Program.CreateDeclareCode(amountOfDimension, dimensionLength);
 
-            string forCycle = Program.GetForInitCycle(amountOfDimension);
+            string forInitCycle = Program.GetForInitCycle(amountOfDimension);
 
             string sort = Program.GetSortCommands(amountOfDimension);
 
@@ -63,11 +65,21 @@ namespace ConsoleApplication1
 
             return string.Join(Environment.NewLine, startFrame,
                                                                 declare,
-                                                                forCycle,
-                                                                sort,
+                                                                forInitCycle,
                                                                 show,
+                                                                space,
+                                                                sort,
+                                                                space,
+                                                                show,
+                                                                space,
                                                                 endFrame);
         }
+
+        private static string GetSpace()
+        {
+            return "Console.WriteLine(); Console.WriteLine();";
+        }
+
 
         private static string GetEndFrame()
         {
@@ -152,16 +164,18 @@ namespace ConsoleApplication1
             StringBuilder forsb = new StringBuilder(); // for (...) {      x N times
             StringBuilder cwsb = new StringBuilder(); // code inside the for cycle
             StringBuilder forendsb = new StringBuilder(); // }     x N times
-            cwsb.Append("Console.WriteLine(array[");
+            cwsb.Append("Console.Write(array[");
 
             for (int i = 0; i < amountOfDimension; i++)
             {
+                forsb.AppendLine("Console.Write(\"{\");");
                 forsb.AppendLine($"for (int i{i} = 0; i{i} < array.GetLength({i}); ++i{i}) {{");
                 forendsb.AppendLine("}");
+                forendsb.AppendLine("Console.Write(\"}\");");
                 cwsb.Append($"i{i},");
             }
             cwsb.Remove(cwsb.Length - 1, 1);
-            cwsb.Append("]);");
+            cwsb.Append("] + \",\");");
 
             return string.Join(Environment.NewLine, forsb,
                                                     cwsb,
@@ -254,11 +268,13 @@ namespace DynaCore
 
         private static void Main()
         {
-            const int amountOfDimension = 3;
+            const int amountOfDimension = 4;
 
-            int[] dimensionLength = { 2, 3, 4 };
+            int[] dimensionLength = { 5, 3, 4, 3 };
 
             string result = Program.GetCode(amountOfDimension, dimensionLength);
+
+            Console.WriteLine(result);
 
             Program.CompileAndRun(new[] { result });
         }
